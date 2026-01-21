@@ -5,7 +5,7 @@ description: Search and retrieve context from Airweave collections. Use when use
 
 # Airweave Search
 
-Use this skill to effectively search and retrieve context from Airweave collections—whether answering questions or gathering context to complete tasks.
+Use this skill to effectively search and retrieve context from Airweave collections, whether answering questions or gathering context to complete tasks.
 
 ## When to Search
 
