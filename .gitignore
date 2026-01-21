@@ -1,0 +1,7 @@
+# Installed skills directories (created when skills are installed by various AI assistants)
+.agent/
+.agents/
+.claude/
+.cursor/
+.gemini/
+
