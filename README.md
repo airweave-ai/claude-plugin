@@ -29,7 +29,29 @@ export AIRWEAVE_API_KEY="your-api-key"
 export AIRWEAVE_COLLECTION="your-collection-id"
 ```
 
-Get your API key from [app.airweave.ai](https://app.airweave.ai) under Settings > API Keys.
+Get your API key from your Airweave dashboard at:
+
+- [app.airweave.ai](https://app.airweave.ai) for Airweave Cloud users
+- or for local deployments, set base_url to `http://localhost:8001`
+
+<video src="./assets/airweave_api_key.mp4" controls autoplay muted loop playsinline width="100%"></video>
+
+Get your Airweave Collection ID from your collection view in the dashboard:
+
+<video src="./assets/airweave_collection_id.mp4" controls autoplay muted loop playsinline width="100%"></video>
+
+Or by listing your collections and taking the `readable_id` of your desired collection:
+
+```typescript
+import { AirweaveSDKClient } from "@airweave/sdk";
+
+const client = new AirweaveSDKClient({ apiKey: "YOUR_AIRWEAVE_API_KEY" });
+await client.collections.list({
+    skip: 0,
+    limit: 100
+});
+
+```
 
 ## Prerequisites
 
