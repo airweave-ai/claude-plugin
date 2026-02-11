@@ -1,0 +1,9 @@
+{
+  "name": "airweave",
+  "description": "Search your apps, databases, and APIs from Claude. Airweave syncs and indexes data from 40+ sources (Slack, GitHub, Notion, Jira, Google Drive, Salesforce, databases, and more) into searchable collections. This plugin connects Claude to your Airweave collections via MCP, giving it hybrid/neural/keyword search with LLM reranking across all your connected data.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Airweave",
+    "email": "lennert@airweave.ai"
+  }
+}

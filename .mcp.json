@@ -1,0 +1,10 @@
+{
+  "airweave-search": {
+    "command": "npx",
+    "args": ["-y", "airweave-mcp-search"],
+    "env": {
+      "AIRWEAVE_API_KEY": "YOUR_AIRWEAVE_API_KEY_HERE",
+      "AIRWEAVE_COLLECTION": "YOUR_AIRWEAVE_COLLECTION_ID_HERE"
+    }
+  }
+}
