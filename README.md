@@ -1,101 +1,107 @@
-# Airweave Agent Skills
+# Airweave for Claude
 
-Reusable skills for AI agents that work with [Airweave](https://github.com/airweave-ai/airweave), the open-source context retrieval platform for AI agents.
+Search your apps, databases, and APIs directly from Claude. Airweave syncs and indexes data from 40+ sources into unified searchable collections with hybrid, neural, and keyword search.
 
 ## Installation
 
-Install skills using the [skills CLI](https://skills.sh/docs):
+### From Claude Code
+
+```
+claude plugin install airweave
+```
+
+### Manual installation
+
+Clone and install the plugin:
 
 ```bash
-npx skills add airweave-ai/skills
+git clone https://github.com/airweave-ai/claude-plugin
+claude plugin install --path ./claude-plugin
 ```
 
-## Available Skills
+### Configuration
 
-### `airweave-setup`
+After installing, set your Airweave credentials:
 
-**For developers integrating Airweave into their applications.**
-
-Helps coding agents when users want to:
-- Install Airweave (cloud or self-hosted)
-- Create collections and connect data sources
-- Set up the SDK (Python/TypeScript)
-- Configure MCP servers
-- Integrate Airweave into their application
-
-```
-airweave-setup/
-├── SKILL.md           # Core setup instructions
-├── SDK-REFERENCE.md   # Python & TypeScript SDK guide
-├── MCP-SETUP.md       # MCP server configuration
-└── SEARCH-PATTERNS.md # Search code patterns
+```bash
+export AIRWEAVE_API_KEY="your-api-key"
+export AIRWEAVE_COLLECTION="your-collection-id"
 ```
 
----
+Get your API key from [app.airweave.ai](https://app.airweave.ai) under Settings > API Keys.
 
-### `airweave-search`
+## Prerequisites
 
-**For agents using Airweave MCP to retrieve context.**
+- [Airweave account](https://app.airweave.ai) (cloud) or [self-hosted instance](https://github.com/airweave-ai/airweave)
+- At least one collection with connected data sources
 
-Helps agents when users ask about their data in connected apps (Slack, GitHub, Notion, Jira, Google Drive, Salesforce, databases, etc.) or need context to complete tasks:
-- When to search vs use training data
-- Query formulation strategies
-- Parameter selection for different intents
-- Result interpretation and presentation
-- Handling no/poor results
+## Features
+
+This plugin provides an MCP server and two skills for working with Airweave:
+
+- **Cross-app search** — Query Slack, GitHub, Notion, Jira, Google Drive, Salesforce, and 40+ other sources from a single interface
+- **Hybrid search** — Combine neural, keyword, and hybrid search methods with LLM reranking
+- **Smart parameter tuning** — Automatic selection of search strategy based on your query intent
+- **AI completions** — Get synthesized answers across all your connected data, not just raw results
+
+## Skills
+
+Skills are auto-invoked based on context:
+
+| Skill | Triggers on |
+|-------|-------------|
+| `airweave-search` | "find messages about...", "search my docs for...", "what did the team discuss..." |
+| `airweave-setup` | "set up Airweave", "connect Slack to Airweave", "install the Airweave SDK" |
+
+### airweave-search
+
+Helps Claude search and retrieve context from your connected data sources. Handles query formulation, parameter selection, result interpretation, and refinement when results are poor.
+
+### airweave-setup
+
+Guides developers through installing Airweave, creating collections, connecting data sources, and integrating the SDK (Python/TypeScript) or MCP server into their applications.
+
+## Example Usage
 
 ```
-airweave-search/
-├── SKILL.md           # Core search decision-making
-├── PARAMETERS.md      # Deep dive on all search parameters
-└── EXAMPLES.md        # Real-world search scenarios
+> What did the team discuss about the product launch in Slack?
+Claude searches your connected Slack workspace and synthesizes relevant messages.
+
+> Find the API spec for our authentication service
+Claude searches across GitHub repos, Confluence docs, and Jira tickets for implementation context.
+
+> What's our current refund policy and when was it last updated?
+Claude searches company wikis and Google Drive to find the authoritative document.
+
+> Check Jira for open bugs related to payments
+Claude queries your Jira project and compiles a summary of outstanding issues.
+
+> Search our Google Drive for the Q4 board deck
+Claude locates files across shared drives using semantic search.
 ```
 
----
+## Supported Sources
 
-## Which Skill Do I Need?
+Airweave connects to 40+ data sources including:
 
-| Use Case | Skill |
-|----------|-------|
-| "Help me set up Airweave" | `airweave-setup` |
-| "How do I connect Slack to Airweave?" | `airweave-setup` |
-| "How do I install the Airweave SDK?" | `airweave-setup` |
-| "Find messages about the product launch" | `airweave-search` |
-| "What did the team discuss in Slack?" | `airweave-search` |
-| "Search my company docs for the refund policy" | `airweave-search` |
-| "Check our Notion docs for the API spec" | `airweave-search` |
-| "Look at the Jira ticket for context" | `airweave-search` |
+| Category | Sources |
+|----------|---------|
+| Productivity | Notion, Google Drive, Google Docs, Dropbox, OneDrive, SharePoint, Airtable |
+| Communication | Slack, Gmail, Outlook, Microsoft Teams, Google Calendar |
+| Project Management | Jira, Linear, Asana, Trello, Monday, ClickUp |
+| Development | GitHub, GitLab, Bitbucket, Confluence |
+| CRM & Sales | Salesforce, HubSpot, Zendesk, Pipedrive, Shopify |
+| Data | PostgreSQL, Stripe |
 
-## How Skills Work
+See the full list at [docs.airweave.ai](https://docs.airweave.ai).
 
-Skills are **knowledge for AI agents**, not tools. They teach agents how to accomplish tasks effectively:
+## Documentation
 
-1. **Discovery**: Agent reads skill metadata at startup
-2. **Trigger**: When user request matches skill description, agent loads full instructions
-3. **Apply**: Agent follows skill guidance to help the user
-4. **Execute**: Agent uses available tools (MCP, code execution) or guides the user
-
-Skills work regardless of execution method:
-- **With MCP**: Agent calls `search-{collection}` tool
-- **With code execution**: Agent writes SDK code
-- **Without tools**: Agent guides the user on what to do
-
-## Resources
-
-- **Airweave Documentation**: https://docs.airweave.ai
-- **Airweave Cloud**: https://app.airweave.ai
-- **GitHub**: https://github.com/airweave-ai/airweave
-- **Discord**: https://discord.gg/484HY9Ehxt
-
-## Contributing
-
-To add or improve skills:
-
-1. Fork this repository
-2. Create/edit skill directories with `SKILL.md` files
-3. Follow the [skill authoring guidelines](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-4. Submit a pull request
+- [Airweave docs](https://docs.airweave.ai)
+- [Airweave Cloud](https://app.airweave.ai)
+- [GitHub](https://github.com/airweave-ai/airweave)
+- [Discord](https://discord.gg/484HY9Ehxt)
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT
