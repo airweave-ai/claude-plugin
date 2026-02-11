@@ -34,11 +34,11 @@ Get your API key from your Airweave dashboard at:
 - [app.airweave.ai](https://app.airweave.ai) for Airweave Cloud users
 - or for local deployments, set base_url to `http://localhost:8001`
 
-<video src="./assets/airweave_api_key.mp4" controls autoplay muted loop playsinline width="100%"></video>
+<video src="https://github.com/user-attachments/assets/80f88796-05ef-43c0-b17e-2b779cded2f5" controls autoplay muted loop playsinline width="100%"></video>
 
 Get your Airweave Collection ID from your collection view in the dashboard:
 
-<video src="./assets/airweave_collection_id.mp4" controls autoplay muted loop playsinline width="100%"></video>
+<video src="https://github.com/user-attachments/assets/6e2d0818-16d6-42da-b130-fad403ff350b" controls autoplay muted loop playsinline width="100%"></video>
 
 Or by listing your collections and taking the `readable_id` of your desired collection:
 
