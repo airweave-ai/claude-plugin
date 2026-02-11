@@ -17,7 +17,7 @@ Clone and install the plugin:
 
 ```bash
 git clone https://github.com/airweave-ai/claude-plugin
-claude plugin install --path ./claude-plugin
+claude --plugin-dir ./claude-plugin
 ```
 
 ### Configuration
