@@ -1,6 +1,7 @@
 # Airweave for Claude
+Official Airweave plugin for Claude Code and Cowork.
 
-Search your apps, databases, and APIs directly from Claude. Airweave syncs and indexes data from 40+ sources into unified searchable collections with hybrid, neural, and keyword search.
+Airweave is a context retrieval layer between Claude and your apps like Notion, Slack, Google Drive, Linear, Jira, GitHub, and Salesforce. Search your apps directly from Claude Code and Cowork. Airweave continually syncs and indexes data from 40+ sources into unified searchable collections with agentic, semantic, and keyword search.
 
 ## Installation
 
@@ -40,9 +41,9 @@ Get your API key from [app.airweave.ai](https://app.airweave.ai) under Settings 
 This plugin provides an MCP server and two skills for working with Airweave:
 
 - **Cross-app search** — Query Slack, GitHub, Notion, Jira, Google Drive, Salesforce, and 40+ other sources from a single interface
-- **Hybrid search** — Combine neural, keyword, and hybrid search methods with LLM reranking
-- **Smart parameter tuning** — Automatic selection of search strategy based on your query intent
-- **AI completions** — Get synthesized answers across all your connected data, not just raw results
+- **Hybrid search** — Combine agentic, neural, keyword, and hybrid search methods with query expansion, filtering, and reranking
+- **Smart parameter tuning** — Enable Claude to do automatic selection of search strategy based on your query intent
+- **AI completions** — Get synthesized answers with citations across all your connected data, not just raw results
 
 ## Skills
 
@@ -64,36 +65,38 @@ Guides developers through installing Airweave, creating collections, connecting 
 ## Example Usage
 
 ```
-> What did the team discuss about the product launch in Slack?
-Claude searches your connected Slack workspace and synthesizes relevant messages.
+> What did the team discuss about the product launch in Slack and does it align with the state of the project in Linear and Notion?
+Claude searches your connected Slack, Linear, and Notion workspaces and synthesizes relevant messages.
 
 > Find the API spec for our authentication service
 Claude searches across GitHub repos, Confluence docs, and Jira tickets for implementation context.
 
 > What's our current refund policy and when was it last updated?
-Claude searches company wikis and Google Drive to find the authoritative document.
+Claude searches company wikis and Google Drive, Jira, and Stripe to find the authoritative document.
 
-> Check Jira for open bugs related to payments
+> Check Jira, Stripe, and Github for open bugs related to payments
 Claude queries your Jira project and compiles a summary of outstanding issues.
 
-> Search our Google Drive for the Q4 board deck
-Claude locates files across shared drives using semantic search.
+> Search our Finance stack for the Q4 board deck
+Claude locates files across shared drives and Salesforce using semantic search.
 ```
 
 ## Supported Sources
 
-Airweave connects to 40+ data sources including:
+Airweave connects to [40+ data sources](https://docs.airweave.ai/connectors/overview) including:
 
 | Category | Sources |
 |----------|---------|
-| Productivity | Notion, Google Drive, Google Docs, Dropbox, OneDrive, SharePoint, Airtable |
-| Communication | Slack, Gmail, Outlook, Microsoft Teams, Google Calendar |
-| Project Management | Jira, Linear, Asana, Trello, Monday, ClickUp |
-| Development | GitHub, GitLab, Bitbucket, Confluence |
-| CRM & Sales | Salesforce, HubSpot, Zendesk, Pipedrive, Shopify |
-| Data | PostgreSQL, Stripe |
+| Productivity & Collaboration | Asana, Airtable, ClickUp, Linear, Monday, Notion, Trello, Todoist |
+| Cloud Storage & Documents | Box, Dropbox, Google Docs, Google Drive, Google Slides, OneDrive, OneNote, SharePoint, Word |
+| Developer Tools | Confluence, Bitbucket, GitHub, GitLab, Jira |
+| CRM & Sales | Attio, HubSpot, Pipedrive, Salesforce, Zoho CRM |
+| Communication & Email | Gmail, Google Calendar, Outlook Calendar, Outlook Mail, Slack, Teams |
+| Support & Service | Zendesk |
+| Databases | PostgreSQL |
+| E-commerce & Payments | Shopify, Stripe |
 
-See the full list at [docs.airweave.ai](https://docs.airweave.ai).
+See the full list at [docs.airweave.ai/connectors/overview](https://docs.airweave.ai/connectors/overview).
 
 ## Documentation
 
