@@ -63,9 +63,9 @@ await client.collections.list({
 This plugin provides an MCP server and two skills for working with Airweave:
 
 - **Cross-app search** — Query Slack, GitHub, Notion, Jira, Google Drive, Salesforce, and 40+ other sources from a single interface
-- **Hybrid search** — Combine agentic, neural, keyword, and hybrid search methods with query expansion, filtering, and reranking
-- **Smart parameter tuning** — Enable Claude to do automatic selection of search strategy based on your query intent
-- **AI completions** — Get synthesized answers with citations across all your connected data, not just raw results
+- **Three search modes** — Instant (fast vector search), Classic (AI-optimized search plans), and Agentic (iterative reasoning over your data)
+- **Smart mode selection** — Claude automatically picks the right search mode based on query complexity
+- **Rich results** — Structured results with breadcrumbs, source metadata, relevance scores, and direct links back to source apps
 
 ## Skills
 

@@ -99,32 +99,51 @@ Once configured, the MCP server exposes these tools:
 
 ### `search-{collection}`
 
-Search within your Airweave collection.
+Search within your Airweave collection using one of three modes.
 
 **Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `query` | string | (required) | Search query text |
-| `response_type` | "raw" \| "completion" | "raw" | Return results or AI answer |
+| `mode` | string | "classic" | Search mode: "instant", "classic", or "agentic" |
 | `limit` | number | 100 | Max results (1-1000) |
-| `offset` | number | 0 | Skip results for pagination |
-| `recency_bias` | number | - | 0-1, favor recent (1=most recent) |
-| `score_threshold` | number | - | 0-1, minimum similarity score (deprecated, may be ignored) |
-| `search_method` | string | "hybrid" | "hybrid", "neural", "keyword" |
-| `expansion_strategy` | string | "auto" | "auto", "llm", "no_expansion" |
-| `enable_reranking` | boolean | true | AI reranking for relevance |
-| `enable_query_interpretation` | boolean | true | Extract filters from query |
+| `offset` | number | 0 | Skip results for pagination (instant/classic only) |
+| `retrieval_strategy` | string | "hybrid" | "hybrid", "neural", "keyword" (instant mode only) |
+| `thinking` | boolean | false | Enable extended reasoning (agentic mode only) |
+
+**Search Modes:**
+
+| Mode | Description |
+|------|-------------|
+| `instant` | Direct vector search — fastest, best for simple lookups |
+| `classic` | AI-optimized search with LLM-generated plans — default, best for most searches |
+| `agentic` | Full agent loop with iterative reasoning — best for complex analysis |
 
 **Example Usage:**
-
-The AI assistant can call the tool like this:
 
 ```
 search-my-collection({
   query: "customer complaints about shipping delays",
-  limit: 10,
-  recency_bias: 0.7
+  mode: "classic",
+  limit: 10
+})
+```
+
+```
+search-my-collection({
+  query: "deployment checklist",
+  mode: "instant",
+  retrieval_strategy: "keyword",
+  limit: 5
+})
+```
+
+```
+search-my-collection({
+  query: "Summarize decisions about the Q4 roadmap",
+  mode: "agentic",
+  thinking: true
 })
 ```
 
@@ -148,21 +167,25 @@ get-config()
 
 Once the MCP server is configured, you can ask your AI assistant:
 
-**Basic Searches:**
+**Basic Searches (classic mode):**
 - "Search for customer feedback about pricing"
 - "Find documents related to API documentation"
 - "Look up information about data privacy policies"
 
-**With Parameters:**
-- "Search for bug reports from the last week" (uses recency_bias)
-- "Find high-quality results about authentication" (uses enable_reranking)
-- "Give me a summary of our refund policy" (uses response_type: completion)
+**Quick Lookups (instant mode):**
+- "Quickly find the deployment checklist"
+- "Look up error code ERR-4032"
+
+**Deep Analysis (agentic mode):**
+- "Analyze what customers are saying about shipping across all channels"
+- "Summarize the key decisions from last week's meetings"
+- "Compare our current auth implementation with what was discussed in the RFC"
 
 **Natural Language Mapping:**
 - "Find the first 5 results" → `limit: 5`
 - "Show me results 11-20" → `limit: 10, offset: 10`
-- "Find the most recent documents" → `recency_bias: 0.8`
-- "Use keyword search" → `search_method: "keyword"`
+- "Use keyword search" → `mode: "instant", retrieval_strategy: "keyword"`
+- "Do a deep search" → `mode: "agentic"`
 
 ## Troubleshooting
 
@@ -183,6 +206,11 @@ Set the collection's readable ID (find it in your Airweave dashboard or via the 
 
 - Check your API key is valid and not expired
 - Ensure the API key has permissions for this collection
+
+### "Airweave API error (422)"
+
+- The collection may have no sources connected — add at least one source
+- Source credentials may have expired — reconnect in the Airweave UI
 
 ### MCP Server Not Appearing
 
@@ -225,4 +253,3 @@ To search multiple collections, configure multiple MCP servers:
 ```
 
 Each collection will have its own search tool: `search-engineering-docs-abc123` and `search-support-tickets-xyz789`.
-

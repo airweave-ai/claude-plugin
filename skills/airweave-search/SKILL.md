@@ -23,6 +23,27 @@ Use this skill to effectively search and retrieve context from Airweave collecti
 - User already provided all needed context in the conversation
 - The question is about Airweave itself, not data within it
 
+## Search Modes
+
+Airweave provides three search modes. Choose based on user intent:
+
+| Mode | When to Use | Speed |
+|------|-------------|-------|
+| `instant` | Simple lookups, exact term matching, browsing | Fastest |
+| `classic` | Most searches — AI generates an optimized search plan | Fast |
+| `agentic` | Complex questions requiring reasoning, multi-step retrieval | Slower, highest quality |
+
+### Mode Selection Guide
+
+| User Intent | Mode |
+|-------------|------|
+| Quick document lookup | `instant` |
+| Finding specific information | `classic` (default) |
+| General topic exploration | `classic` |
+| "Summarize", "analyze", "compare" | `agentic` |
+| Complex multi-source questions | `agentic` |
+| Simple keyword search | `instant` with `retrieval_strategy: "keyword"` |
+
 ## Query Formulation
 
 ### Extract Key Concepts
@@ -43,35 +64,23 @@ Turn user intent into effective search queries:
 3. **Be specific but not too narrow** - Start moderately specific, broaden if no results
 4. **Avoid filler words** - Skip "please find", "can you search for"
 
-## Parameter Selection
-
-Choose parameters based on user intent:
-
-| User Intent | Parameters |
-|-------------|------------|
-| Recent updates/conversations | `recency_bias: 0.7-0.9` |
-| Finding a specific document | `search_method: "keyword"` or `"hybrid"` |
-| General topic exploration | `search_method: "hybrid"`, higher `limit` |
-| High-quality results only | `enable_reranking: true` |
-| Quick direct answer | `response_type: "completion"` |
-| Browse/see all matches | `response_type: "raw"`, `limit: 20-50` |
-
-### Parameter Quick Reference
+## Parameter Quick Reference
 
 | Parameter | Values | When to Use |
 |-----------|--------|-------------|
-| `recency_bias` | 0-1 | Higher = favor recent. Use 0.7+ for "recent", "latest", "this week" |
-| `search_method` | hybrid/neural/keyword | `keyword` for exact terms, `neural` for concepts, `hybrid` for both |
-| `response_type` | raw/completion | `completion` for direct answers, `raw` to show sources |
+| `mode` | instant/classic/agentic | `instant` for speed, `classic` for most searches, `agentic` for complex reasoning |
 | `limit` | 1-1000 | Lower (5-10) for quick answers, higher (20-50) for exploration |
-| `enable_reranking` | boolean | `true` for better relevance (slightly slower) |
-| `expansion_strategy` | auto/llm/no_expansion | `auto` for most cases, `no_expansion` for exact queries |
+| `offset` | 0+ | Pagination (instant/classic only) |
+| `retrieval_strategy` | hybrid/neural/keyword | Instant mode only: `keyword` for exact terms, `neural` for concepts, `hybrid` (default) for both |
+| `thinking` | boolean | Agentic mode only: enable extended reasoning for complex queries |
 
 See [PARAMETERS.md](PARAMETERS.md) for detailed guidance.
 
 ## Handling Results
 
 ### Interpreting Scores
+
+Results include a `relevance_score` field:
 
 | Score | Meaning | Action |
 |-------|---------|--------|
@@ -80,24 +89,36 @@ See [PARAMETERS.md](PARAMETERS.md) for detailed guidance.
 | 0.50-0.70 | Possibly relevant | Mention uncertainty |
 | Below 0.50 | Weak match | Consider rephrasing query |
 
+### Understanding Result Structure
+
+Each result contains:
+- **`name`** — Document/entity title
+- **`textual_representation`** — The full text content
+- **`breadcrumbs`** — Hierarchy path (e.g., Workspace > Channel > Message)
+- **`airweave_system_metadata.source_name`** — Source app (e.g., "Slack", "Notion")
+- **`web_url`** — Link back to the original item
+- **`created_at`** / **`updated_at`** — Timestamps
+
 ### Synthesizing Answers
 
 When presenting results to users:
 
 1. **Lead with the answer** - Don't start with "I found 5 results"
 2. **Cite sources** - Mention where info came from ("According to your Slack conversation...")
-3. **Synthesize, don't dump** - Combine relevant parts into coherent response
-4. **Acknowledge gaps** - If results don't fully answer, say so
+3. **Use breadcrumbs** - Reference the hierarchy path for context ("In the Engineering > API Design channel...")
+4. **Synthesize, don't dump** - Combine relevant parts into coherent response
+5. **Acknowledge gaps** - If results don't fully answer, say so
 
 ### Handling No/Poor Results
 
 If search returns no results or low-quality matches:
 
-1. **Broaden the query** - Remove specific terms, use more general concepts
-2. **Try different phrasing** - Rephrase using synonyms or related terms
-3. **Increase limit** - Fetch more results to find relevant matches
-4. **Check source availability** - The data source might not be connected
-5. **Ask for clarification** - User might have more context to share
+1. **Try a different mode** - Switch from `instant` to `classic`, or `classic` to `agentic`
+2. **Broaden the query** - Remove specific terms, use more general concepts
+3. **Try different phrasing** - Rephrase using synonyms or related terms
+4. **Increase limit** - Fetch more results to find relevant matches
+5. **Check source availability** - The data source might not be connected
+6. **Ask for clarification** - User might have more context to share
 
 ## Finding the Search Tool
 
@@ -123,7 +144,7 @@ Use the `search-{collection}` MCP tool with your chosen parameters:
 ```
 search-acmes-slack-k8v2x1({
   query: "customer feedback pricing",
-  recency_bias: 0.7,
+  mode: "classic",
   limit: 10
 })
 ```
@@ -131,19 +152,18 @@ search-acmes-slack-k8v2x1({
 ```
 search-acmes-notion-p3m9q7({
   query: "API authentication docs",
-  search_method: "hybrid",
-  enable_reranking: true
+  mode: "instant",
+  retrieval_strategy: "hybrid"
 })
 ```
 
 ```
 search-acmes-jira-w5n4r2({
-  query: "What is our refund policy?",
-  response_type: "completion"
+  query: "What decisions were made about the refund policy?",
+  mode: "agentic"
 })
 ```
 
 ## Examples
 
 See [EXAMPLES.md](EXAMPLES.md) for complete conversation examples showing effective search patterns.
-

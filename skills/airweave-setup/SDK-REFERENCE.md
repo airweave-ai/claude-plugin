@@ -191,38 +191,21 @@ client.source_connections.sync(
 
 ## Search API
 
-### Basic Search
+Airweave provides three search modes: **instant**, **classic**, and **agentic**.
+
+### Instant Search
+
+Direct vector search. Fastest mode.
 
 **Python:**
 ```python
 results = client.collections.search(
     readable_id=collection.readable_id,
-    query="Find customer complaints about shipping"
-)
-```
-
-**TypeScript:**
-```typescript
-const results = await client.collections.search(
-    collection.readableId,
-    { query: "Find customer complaints about shipping" }
-);
-```
-
-### Search with Parameters
-
-**Python:**
-```python
-results = client.collections.search(
-    readable_id=collection.readable_id,
-    query="API documentation",
-    search_type="hybrid",           # "semantic" (default) or "hybrid"
-    limit=20,                       # Max results
-    offset=0,                       # For pagination
-    recency_bias=0.5,              # 0-1, favor recent content
-    enable_reranking=True,         # AI reranking
-    enable_query_expansion=True,   # Expand query variations
-    top_k=50                       # Internal retrieval count
+    query="Find customer complaints about shipping",
+    mode="instant",
+    retrieval_strategy="hybrid",  # "hybrid" (default), "neural", "keyword"
+    limit=20,
+    offset=0
 )
 ```
 
@@ -231,85 +214,105 @@ results = client.collections.search(
 const results = await client.collections.search(
     collection.readableId,
     {
-        query: "API documentation",
-        searchType: "hybrid",
-        limit: 20,
-        recencyBias: 0.5,
-        enableReranking: true,
-        enableQueryExpansion: true,
-        topK: 50
+        query: "Find customer complaints about shipping",
+        mode: "instant",
+        retrievalStrategy: "hybrid",
+        limit: 20
     }
 );
 ```
 
-### AI Completion Response
+### Classic Search
 
-Instead of raw results, get an AI-synthesized answer:
-
-**Python:**
-```python
-answer = client.collections.search(
-    readable_id=collection.readable_id,
-    query="What is our vacation policy?",
-    response_type="completion",
-    enable_reranking=True
-)
-# Returns synthesized answer based on search results
-```
-
-### Advanced Search with Filters
+AI-optimized search with LLM-generated search plans. Default mode.
 
 **Python:**
 ```python
-from airweave import SearchRequest, Filter, FieldCondition, MatchAny, Range
-
-search_request = SearchRequest(
-    query="bug reports",
-    filter=Filter(
-        must=[
-            FieldCondition(
-                key="source_name",
-                match=MatchAny(any=["GitHub", "Jira"])
-            )
-        ],
-        should=[
-            FieldCondition(
-                key="priority",
-                match=MatchAny(any=["high", "critical"])
-            )
-        ]
-    ),
-    recency_bias=0.6,
-    enable_reranking=True,
-    limit=25
-)
-
-results = client.collections.search_advanced(
+results = client.collections.search(
     readable_id=collection.readable_id,
-    search_request=search_request
+    query="API documentation",
+    mode="classic",
+    limit=20,
+    offset=0
 )
 ```
+
+### Agentic Search
+
+Full agent loop with iterative reasoning.
+
+**Python:**
+```python
+results = client.collections.search(
+    readable_id=collection.readable_id,
+    query="Summarize the key decisions from last week's product meetings",
+    mode="agentic",
+    thinking=True,   # Enable extended reasoning
+    limit=10         # Optional — agent decides if not set
+)
+```
+
+### Search Parameters
+
+| Parameter | Type | Modes | Description |
+|-----------|------|-------|-------------|
+| `query` | string | All | Search query (required) |
+| `mode` | string | All | `"instant"`, `"classic"` (default), `"agentic"` |
+| `limit` | number | All | Max results (1-1000, default: 100) |
+| `offset` | number | instant, classic | Skip results for pagination (default: 0) |
+| `retrieval_strategy` | string | instant | `"hybrid"` (default), `"neural"`, `"keyword"` |
+| `thinking` | boolean | agentic | Enable extended reasoning (default: false) |
+| `filter` | list | All | Filter groups for narrowing results |
 
 ## Search Result Structure
 
 ```python
-results.results  # List of result objects
+results.results  # List of SearchResult objects
 
 # Each result contains:
 {
-    "id": "...",
-    "score": 0.87,
-    "payload": {
-        "md_content": "The actual content...",
-        "source_name": "Slack",
-        "source_type": "slack",
-        "url": "https://...",
-        "created_at": "2024-01-15T10:30:00Z",
-        "updated_at": "2024-01-15T10:30:00Z",
-        # Additional source-specific metadata
+    "entity_id": "page-abc123",
+    "name": "Production Deployment Guide",
+    "relevance_score": 0.94,
+    "textual_representation": "# Production Deployment Guide\n\nThis document covers...",
+    "breadcrumbs": [
+        {"entity_id": "ws-1", "name": "Acme Workspace", "entity_type": "NotionWorkspaceEntity"},
+        {"entity_id": "db-eng", "name": "Engineering", "entity_type": "NotionDatabaseEntity"}
+    ],
+    "airweave_system_metadata": {
+        "source_name": "notion",
+        "entity_type": "NotionPageEntity",
+        "original_entity_id": "page-abc123",
+        "chunk_index": 0,
+        "sync_id": "d4e5f6a7-...",
+        "sync_job_id": "a1b2c3d4-..."
+    },
+    "access": {"viewers": null, "is_public": null},
+    "web_url": "https://notion.so/Deployment-Guide-abc123",
+    "url": null,
+    "created_at": "2025-02-10T09:15:00Z",
+    "updated_at": "2025-03-18T16:30:00Z",
+    "raw_source_fields": {
+        "icon": "...",
+        "archived": false
     }
 }
 ```
+
+### Key Result Fields
+
+| Field | Description |
+|-------|-------------|
+| `entity_id` | Unique ID of the entity in the source |
+| `name` | Display name / title |
+| `relevance_score` | Relevance score (0-1, higher = more relevant) |
+| `textual_representation` | Full text content |
+| `breadcrumbs` | Hierarchy path (e.g., Workspace > Database > Page) |
+| `airweave_system_metadata.source_name` | Source app (e.g., "slack", "notion") |
+| `web_url` | Link to view in the source application |
+| `url` | Download URL (for file entities only) |
+| `created_at` / `updated_at` | Timestamps |
+| `raw_source_fields` | Source-specific metadata |
 
 ## Error Handling
 
@@ -321,10 +324,11 @@ try:
         query="test"
     )
 except Exception as e:
-    # Handle API errors - check status code or message
     error_msg = str(e)
     if "404" in error_msg:
         print("Collection not found")
+    elif "422" in error_msg:
+        print("Invalid request (e.g., collection has no sources)")
     elif "401" in error_msg or "403" in error_msg:
         print("Invalid API key or access denied")
     else:
@@ -353,4 +357,3 @@ def search_with_retry(client, collection_id, query, max_retries=3):
             else:
                 raise
 ```
-
