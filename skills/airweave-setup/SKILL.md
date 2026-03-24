@@ -90,64 +90,74 @@ Most sources use OAuth for authentication. Use the Airweave UI at https://app.ai
 
 ### 3. Search Your Data
 
-Once synced, search across all connected sources with a single query:
+Once synced, search across all connected sources. Airweave provides three search modes:
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| `instant` | Direct vector search | Fast lookups, browsing |
+| `classic` | AI-optimized search with LLM-generated search plans | Most searches (default) |
+| `agentic` | Full agent loop with iterative reasoning | Complex questions, analysis |
 
 **Python:**
 ```python
+# Classic search (default) — AI-optimized
 results = client.collections.search(
     readable_id=collection.readable_id,
-    query="customer feedback about pricing"
+    query="customer feedback about pricing",
+    mode="classic"
 )
 
 for result in results.results:
-    print(f"Source: {result['payload']['source_name']}")
-    print(f"Content: {result['payload']['md_content'][:200]}...")
-    print(f"Score: {result['score']}")
+    print(f"Source: {result.airweave_system_metadata.source_name}")
+    print(f"Name: {result.name}")
+    print(f"Content: {result.textual_representation[:200]}...")
+    print(f"Score: {result.relevance_score}")
+    print(f"URL: {result.web_url}")
 ```
 
-## Advanced Search Features
+## Search Modes in Detail
 
-Airweave provides powerful search capabilities:
+### Instant Search
 
-### Search Parameters
+Fast, direct vector search. Best for simple lookups.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `query` | string | Natural language search query |
-| `search_type` | "semantic" \| "hybrid" | Semantic (default) or hybrid search |
-| `limit` | number | Max results (default: 100) |
-| `offset` | number | Skip results for pagination |
-| `recency_bias` | 0-1 | Prioritize recent results (0=none, 1=most recent) |
-| `enable_reranking` | boolean | AI reranking for better relevance |
-| `enable_query_expansion` | boolean | Expand query with variations |
-| `response_type` | "raw" \| "completion" | Raw results or AI-generated answer |
-| `top_k` | number | Internal retrieval count before reranking |
+```python
+results = client.collections.search(
+    readable_id=collection.readable_id,
+    query="API documentation",
+    mode="instant",
+    retrieval_strategy="hybrid",  # "hybrid" (default), "neural", or "keyword"
+    limit=20,
+    offset=0
+)
+```
 
-### Example: Advanced Search
+### Classic Search
+
+AI generates an optimized search plan. Best general-purpose mode.
 
 ```python
 results = client.collections.search(
     readable_id=collection.readable_id,
     query="technical documentation",
-    search_type="hybrid",
-    enable_query_expansion=True,
-    enable_reranking=True,
-    recency_bias=0.5,
-    top_k=50,
-    limit=20
+    mode="classic",
+    limit=20,
+    offset=0
 )
 ```
 
-### Example: AI-Generated Answer
+### Agentic Search
+
+Full agent loop that iteratively searches, reads, and reasons over results.
 
 ```python
-answer = client.collections.search(
+results = client.collections.search(
     readable_id=collection.readable_id,
-    query="What are our customer refund policies?",
-    response_type="completion",
-    enable_reranking=True
+    query="Summarize all decisions about the authentication redesign",
+    mode="agentic",
+    thinking=True,  # Enable extended reasoning
+    limit=10
 )
-# Returns a synthesized answer instead of raw results
 ```
 
 ## MCP Integration for AI Agents
@@ -182,60 +192,13 @@ For cloud-based AI platforms like OpenAI Agent Builder:
 
 See [MCP-SETUP.md](MCP-SETUP.md) for detailed configuration.
 
-## Common Patterns
-
-### Pattern 1: Search with Source Filtering
-
-```python
-from airweave import SearchRequest, Filter, FieldCondition, MatchAny
-
-search_request = SearchRequest(
-    query="project updates",
-    filter=Filter(
-        must=[
-            FieldCondition(
-                key="source_name",
-                match=MatchAny(any=["Slack", "GitHub"])
-            )
-        ]
-    )
-)
-
-results = client.collections.search_advanced(
-    readable_id=collection.readable_id,
-    search_request=search_request
-)
-```
-
-### Pattern 2: Recent Documents First
-
-```python
-results = client.collections.search(
-    readable_id=collection.readable_id,
-    query="critical bugs",
-    recency_bias=0.8,  # Strongly prefer recent
-    limit=10
-)
-```
-
-### Pattern 3: High-Quality Results with Reranking
-
-```python
-results = client.collections.search(
-    readable_id=collection.readable_id,
-    query="API documentation",
-    enable_reranking=True,
-    top_k=30,
-    limit=10
-)
-```
-
 ## Troubleshooting
 
 ### No Results Found
 - Check that sync has completed (can take a few minutes for large sources)
 - Verify the collection ID is correct
 - Try a broader search query
+- Try a different search mode (e.g., `classic` instead of `instant`)
 
 ### Authentication Errors
 - Verify your API key is valid
@@ -256,4 +219,3 @@ results = client.collections.search(
 
 For detailed SDK reference, see [SDK-REFERENCE.md](SDK-REFERENCE.md).
 For advanced search patterns, see [SEARCH-PATTERNS.md](SEARCH-PATTERNS.md).
-
